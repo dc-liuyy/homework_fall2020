@@ -72,12 +72,14 @@ class ReplayBuffer(object):
                 == self.terminals.shape[0]
         )
 
-        ## TODO return batch_size number of random entries from each of the 5 component arrays above
+        ## return batch_size number of random entries from each of the 5 component arrays above
         ## HINT 1: use np.random.permutation to sample random indices
         ## HINT 2: return corresponding data points from each array (i.e., not different indices from each array)
         ## HINT 3: look at the sample_recent_data function below
+        index = np.random.permutation(self.obs.shape[0])
 
-        return TODO, TODO, TODO, TODO, TODO
+        return (self.obs[index[-batch_size:]], self.acs[index[-batch_size:]],self.rews[index[-batch_size:]],
+                self.next_obs[index[-batch_size:]], self.terminals[index[-batch_size:]])
 
     def sample_recent_data(self, batch_size=1):
         return (
