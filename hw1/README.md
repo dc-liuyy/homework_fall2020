@@ -1,3 +1,22 @@
+- 作业报告见`hw1-report.pdf`
+
+- 修改后的代码在cs85文件夹中，hw1.zip中打包了代码和运行日志
+
+- 运行命令范例
+
+	```shell
+	# BC
+	python run_hw1.py --expert_policy_file cs285/policies/experts/Ant.pkl --env_name Ant-v2 --exp_name bc_ant --n_iter 1 --expert_data cs285/expert_data/expert_data_Ant-v2.pkl --video_log_freq -1 --eval_batch_size 50000 --size 32
+	
+	# DAgger
+	python .\run_hw1.py --expert_policy_file cs285/policies/experts/Ant.pkl --env_name Ant-v2 --exp_name dagger_ant --n_iter 10 --do_dagger --expert_data cs285/expert_data/expert_data_Ant-v2.pkl --video_log_freq -1 --eval_batch_size 50000
+	```
+
+
+
+
+
+
 ## Setup
 
 You can run this code on your own machine or on Google Colab. 
