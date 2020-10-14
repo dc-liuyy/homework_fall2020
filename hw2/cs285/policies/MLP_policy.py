@@ -86,8 +86,22 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 
     # query the policy with observation(s) to get selected action(s)
     def get_action(self, obs: np.ndarray) -> np.ndarray:
-        # TODO: get this from hw1
-        return action
+
+        #  get this from hw1
+        if len(obs.shape) > 1:
+            observation = ptu.from_numpy(obs)
+        else:
+            observation = ptu.from_numpy(obs[None])
+        #  return the action that the policy prescribes
+        if self.discrete:
+            probs = ptu.to_numpy(F.softmax(self.forward(observation),dim=-1))
+            assert self.ac_dim==probs.shape[-1]
+            actions = np.array([np.random.choice(self.ac_dim, p=prob) for prob in probs])
+            return actions
+        else:
+            # TODO: continuous action
+            return ptu.to_numpy(self.mean_net(observation))
+            
 
     # update/train this policy
     def update(self, observations, actions, **kwargs):
@@ -99,8 +113,12 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
     # return more flexible objects, such as a
     # `torch.distributions.Distribution` object. It's up to you!
     def forward(self, observation: torch.FloatTensor):
-        # TODO: get this from hw1
-        return action_distribution
+        # get this from hw1
+        if self.discrete:
+            return self.logits_na(observation)
+        else:
+            #TODO: continuous action
+            return None
 
 
 #####################################################
@@ -124,12 +142,19 @@ class MLPPolicyPG(MLPPolicy):
         # HINT2: you will want to use the `log_prob` method on the distribution returned
             # by the `forward` method
         # HINT3: don't forget that `optimizer.step()` MINIMIZES a loss
+        if self.discrete:
+            log_prob = (F.log_softmax(self.forward(observations), dim=-1) * F.one_hot(actions.long(), num_classes=self.ac_dim)).sum(dim=-1)
+        else:
+            #TODO: continuous action
+            log_prob = 0
+        loss = - (log_prob*advantages).sum()
+        print(loss)
 
-        loss = TODO
-
-        # TODO: optimize `loss` using `self.optimizer`
+        # optimize `loss` using `self.optimizer`
         # HINT: remember to `zero_grad` first
-        TODO
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
 
         if self.nn_baseline:
             ## TODO: normalize the q_values to have a mean of zero and a standard deviation of one

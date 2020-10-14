@@ -83,7 +83,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 
         #  return the action that the policy prescribes
         if self.discrete:
-            return ptu.to_numpy(self.forward(observation).argmax().item())
+            return self.logits_na(observation).argmax().item()
         else:
             return ptu.to_numpy(self.mean_net(observation))
         raise NotImplementedError

@@ -3,6 +3,7 @@ import numpy as np
 from .base_agent import BaseAgent
 from cs285.policies.MLP_policy import MLPPolicyPG
 from cs285.infrastructure.replay_buffer import ReplayBuffer
+from cs285.infrastructure.utils import normalize
 
 
 class PGAgent(BaseAgent):
@@ -44,9 +45,9 @@ class PGAgent(BaseAgent):
         # step 2: calculate advantages that correspond to each (s_t, a_t) point
         advantages = self.estimate_advantage(observations, q_values)
 
-        # TODO: step 3: use all datapoints (s_t, a_t, q_t, adv_t) to update the PG actor/policy
+        # step 3: use all datapoints (s_t, a_t, q_t, adv_t) to update the PG actor/policy
         ## HINT: `train_log` should be returned by your actor update method
-        train_log = TODO
+        train_log = self.actor.update(observations, actions, advantages, q_values)
 
         return train_log
 
@@ -63,6 +64,7 @@ class PGAgent(BaseAgent):
             # For each point (s_t, a_t), associate its value as being the discounted sum of rewards over the full trajectory
             # In other words: value of (s_t, a_t) = sum_{t'=0}^T gamma^t' r_{t'}
             q_values = np.concatenate([self._discounted_return(r) for r in rewards_list])
+            
 
         # Case 2: reward-to-go PG
         # Estimate Q^{pi}(s_t, a_t) by the discounted sum of rewards starting from t
@@ -90,8 +92,8 @@ class PGAgent(BaseAgent):
             ## baseline was trained with standardized q_values, so ensure that the predictions
             ## have the same mean and standard deviation as the current batch of q_values
             baselines = baselines_unnormalized * np.std(q_values) + np.mean(q_values)
-            ## TODO: compute advantage estimates using q_values and baselines
-            advantages = TODO
+            ## compute advantage estimates using q_values and baselines
+            advantages = q_values - baselines
 
         # Else, just set the advantage to [Q]
         else:
@@ -99,10 +101,12 @@ class PGAgent(BaseAgent):
 
         # Normalize the resulting advantages
         if self.standardize_advantages:
-            ## TODO: standardize the advantages to have a mean of zero
+            ## standardize the advantages to have a mean of zero
             ## and a standard deviation of one
             ## HINT: there is a `normalize` function in `infrastructure.utils`
-            advantages = TODO
+            advantages_mean = np.average(advantages)
+            advantages_std = np.std(advantages)
+            advantages = normalize(advantages, advantages_mean, advantages_std)
 
         return advantages
 
@@ -128,9 +132,14 @@ class PGAgent(BaseAgent):
             Output: list where each index t contains sum_{t'=0}^T gamma^t' r_{t'}
         """
 
-        # TODO: create list_of_discounted_returns
+        # create list_of_discounted_returns
         # Hint: note that all entries of this output are equivalent
             # because each sum is from 0 to T (and doesnt involve t)
+            
+        T = len(rewards)
+        discounts = np.concatenate(([1], np.cumprod(np.ones(T-1)*self.gamma)))
+        discounted_returns = np.dot(discounts, rewards)  # scalar
+        list_of_discounted_returns = list(np.ones(T)*discounted_returns)
 
         return list_of_discounted_returns
 
@@ -141,11 +150,14 @@ class PGAgent(BaseAgent):
             -and returns a list where the entry in each index t' is sum_{t'=t}^T gamma^(t'-t) * r_{t'}
         """
 
-        # TODO: create `list_of_discounted_returns`
+        # create `list_of_discounted_returns`
         # HINT1: note that each entry of the output should now be unique,
             # because the summation happens over [t, T] instead of [0, T]
         # HINT2: it is possible to write a vectorized solution, but a solution
             # using a for loop is also fine
+        T = len(rewards)   
+        discounts = np.concatenate(([1], np.cumprod(np.ones(T-1)*self.gamma)))     
+        list_of_discounted_returns = list(np.cumsum(discounts * rewards))  
 
-        return list_of_discounted_cumsums
+        return list_of_discounted_returns
 
