@@ -156,8 +156,10 @@ class PGAgent(BaseAgent):
         # HINT2: it is possible to write a vectorized solution, but a solution
             # using a for loop is also fine
         T = len(rewards)   
-        discounts = np.concatenate(([1], np.cumprod(np.ones(T-1)*self.gamma)))     
-        list_of_discounted_returns = list(np.cumsum(discounts * rewards))  
+        discounts = np.concatenate(([1], np.cumprod(np.ones(T-1)*self.gamma)))  
+        discounted_return = discounts * rewards   
+        
+        list_of_discounted_returns = list(np.cumsum(discounted_return[::-1]))[::-1]  
 
         return list_of_discounted_returns
 
