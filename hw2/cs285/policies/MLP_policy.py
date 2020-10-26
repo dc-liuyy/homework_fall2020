@@ -136,11 +136,11 @@ class MLPPolicyPG(MLPPolicy):
         # HINT2: you will want to use the `log_prob` method on the distribution returned
             # by the `forward` method
         # HINT3: don't forget that `optimizer.step()` MINIMIZES a loss
-        log_prob = self(observations).log_prob(actions)        
+        log_prob = self(observations).log_prob(actions)     
         if len(log_prob.shape)>1:
-            log_prob = log_prob.sum(dim=list(np.arange(1,len(log_prob.shape))))
+            log_prob = log_prob.sum(-1)
         assert log_prob.shape == advantages.shape
-        loss = - (log_prob*advantages).sum()
+        loss = -(log_prob*advantages).sum()
 
         # optimize `loss` using `self.optimizer`
         # HINT: remember to `zero_grad` first

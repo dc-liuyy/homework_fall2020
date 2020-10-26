@@ -38,7 +38,6 @@ class PGAgent(BaseAgent):
             Training a PG agent refers to updating its actor using the given observations/actions
             and the calculated qvals/advantages that come from the seen rewards.
         """
-
         # step 1: calculate q values of each (s_t, a_t) point, using rewards (r_0, ..., r_t, ..., r_T)
         q_values = self.calculate_q_vals(rewards_list)
 
