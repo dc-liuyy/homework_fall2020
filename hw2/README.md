@@ -1,3 +1,15 @@
+报告见hw2-report.pdf
+
+
+
+
+
+
+
+
+
+
+
 ## Setup
 
 You can run this code on your own machine or on Google Colab. 
