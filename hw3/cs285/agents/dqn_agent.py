@@ -46,9 +46,7 @@ class DQNAgent(object):
         # store the latest observation ("frame") into the replay buffer
         # HINT: the replay buffer used here is `MemoryOptimizedReplayBuffer`
             # in dqn_utils.py
-        self.replay_buffer_idx = self.replay_buffer.next_idx
-        print("replay_buffer_idx:",self.replay_buffer_idx)
-        print(self.replay_buffer.obs)
+        self.replay_buffer_idx = self.replay_buffer.store_frame(self.last_obs)
 
         eps = self.exploration.value(self.t)
 
@@ -64,9 +62,8 @@ class DQNAgent(object):
                 # to deal with the partial observability of the environment. Get the most recent 
                 # `frame_history_len` observations using functionality from the replay buffer,
                 # and then use those observations as input to your actor. 
-            frames = self.replay_buffer.obs[-self.replay_buffer]
-            action = self.actor.get_action()
-        TODO
+            action = self.actor.get_action(self.replay_buffer.encode_recent_observation())
+        
         # take a step in the environment using the action from the policy
         # HINT1: remember that self.last_obs must always point to the newest/latest observation
         # HINT2: remember the following useful function that you've seen before:
@@ -96,15 +93,15 @@ class DQNAgent(object):
                 and self.replay_buffer.can_sample(self.batch_size)
         ):
 
-            # TODO fill in the call to the update function using the appropriate tensors
+            # fill in the call to the update function using the appropriate tensors
             log = self.critic.update(
-                TODO
+                ob_no, ac_na, next_ob_no, re_n, terminal_n
             )
 
-            # TODO update the target network periodically 
+            # update the target network periodically 
             # HINT: your critic already has this functionality implemented
             if self.num_param_updates % self.target_update_freq == 0:
-                TODO
+                self.critic.update_target_network()
 
             self.num_param_updates += 1
 

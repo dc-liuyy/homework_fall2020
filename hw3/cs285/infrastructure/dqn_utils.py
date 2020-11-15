@@ -82,9 +82,9 @@ def get_env_kwargs(env_name):
 
 def create_lander_q_network(ob_dim, num_actions):
     return nn.Sequential(
-        nn.Linear(ob_dim, 64),
+        nn.Linear(ob_dim, 32),
         nn.ReLU(),
-        nn.Linear(64, 64),
+        nn.Linear(32, 64),
         nn.ReLU(),
         nn.Linear(64, num_actions),
     )

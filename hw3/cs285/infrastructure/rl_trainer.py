@@ -203,22 +203,22 @@ class RL_Trainer(object):
         """
         # get this from Piazza
 
-        if (itr == 0) and (load_initial_expertdata is not None):
-            with open(load_initial_expertdata, 'rb') as f:
-                loaded_paths = pickle.loads(f.read())
+        # if (itr == 0) and (load_initial_expertdata is not None):
+        #     with open(load_initial_expertdata, 'rb') as f:
+        #         loaded_paths = pickle.loads(f.read())
 
-            return loaded_paths, 0, None
+        #     return loaded_paths, 0, None
 
         #  collect `batch_size` samples to be used for training
         # HINT1: use sample_trajectories from utils
         # HINT2: you want each of these collected rollouts to be of length self.params['ep_len']
         print("\nCollecting data to be used for training...")
-        paths, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, batch_size, self.params['ep_len'], True, "human")
+        paths, envsteps_this_batch = utils.sample_trajectories(self.env, collect_policy, num_transitions_to_sample, self.params['ep_len'], True, "human")
         
         # collect more rollouts with the same policy, to be saved as videos in tensorboard
         # note: here, we collect MAX_NVIDEO rollouts, each of length MAX_VIDEO_LEN
         train_video_paths = None
-        if self.log_video:
+        if self.logvideo:
             print('\nCollecting train rollouts to be used for saving videos...')
             ##  look in utils and implement sample_n_trajectories
             train_video_paths = utils.sample_n_trajectories(self.env, collect_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True, "human")
@@ -227,7 +227,7 @@ class RL_Trainer(object):
 
     def train_agent(self):
         # get this from Piazza
-        print('\nTraining agent using sampled data from replay buffer...')
+        # print('\nTraining agent using sampled data from replay buffer...')
         all_logs = []
         for train_step in range(self.params['num_agent_train_steps_per_iter']):
 
