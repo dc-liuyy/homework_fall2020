@@ -98,6 +98,7 @@ class BootstrappedContinuousCritic(nn.Module, BaseCritic):
             q_tp1 = self(next_ob_no)
             # target
             target = reward_n + self.gamma * q_tp1 * (1-terminal_n)
+            target = target.detach()
 
             for j in range(self.num_grad_steps_per_target_update):
                 q_sa = self(ob_no)
